@@ -1,0 +1,6 @@
+kind: wasmer.io/App.v0
+name: test123wasmer
+owner: vabades303
+package: .
+scaling:
+  mode: single_concurrency
