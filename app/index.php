@@ -4,26 +4,24 @@
 /************* Universal constants********************************************************************/
     $limit_size_setting = "20";//server limit // if you are using url file then currently file size is limited to 20mb & if you are also using relaytive path means download & then upload then limit is 50mb
     $telegram_max_file_size = "50";
-    $use_proxy = false;
     $base_site_url = "https://www.xvideos.com";
-    $token = '7177155907:AAGJNdzWong2e7jGm82AUyDRCtVMw3WcnA8'; 
-    //$token = $_ENV["token"];
+    //$token = '5502034647:AAGQx84fiC_ksQNCdABcxasdaszzzxxxxxxxx'; 
+    $token = $_ENV["token"];
+	$token = '7177155907:AAGJNdzWong2e7jGm82AUyDRCtVMw3WcnA8'; 
     $input_logs = true; $input_logs_filename = "log1.txt";                              //this will store complete input
     $filtered_input_logs = true; $filtered_input_logs_file_name = "log_filtered.txt";   //this will store search results
     $fevouriteButton = true; $user_fevourites = "log_user_fevourites.txt"; $fileIDandUniqueID = "log_fileIDandUniqueID.txt";          //this will store file ID and unique ID so when you will make anything fevourite it will find its file_ID from unique ID(can't send file id in callbck) and store in file
     $pExtension = ".m3u";
     $override_total_matches = 0; //or null or 0//so that when someone run start command it will show only first $override_total_matches matches
-    $offline_for_maintainence = true;
+    $offline_for_maintainence = false;
     $php_version = 7; // use integers only //use 7 if you will face any error on 8
     $send_photo_or_video = "video"; //acceptable inputs = "Video" or "Photo" //note: do not give any space
-    global $limit_size_setting; global $telegram_max_file_size; global $base_site_url; global $token; global $pExtension; global $proxyA;global $use_proxy;
+    global $limit_size_setting; global $telegram_max_file_size; global $base_site_url; global $token; global $pExtension;
 /************ ***************************************************************************************/
 /********************** check if code should be run of not********************************************/
     $input  = file_get_contents('php://input');
     if (empty($input)) {    die("Input data missing.");    }
 /****************************************************************************************************/
-//check if proxy is set for curl or not
-if($use_proxy=true) { $proxyA = file_get_contents("proxy.txt"); }
 /***********************Check if it is msg or callback by bot****************************************/
     $data = json_decode($input);
     if(empty($data->message)){ 
@@ -48,7 +46,6 @@ if($use_proxy=true) { $proxyA = file_get_contents("proxy.txt"); }
     if(empty($chat_id)){ die("Correct data is missing"); }
 /************ ***************************************************************************************/
 /**********************Offline for Maintainence msg**************************************************/
-echo "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=Offline for maintainence. Try again after few hours.🥲";
 if($offline_for_maintainence == true){ curlCommand(false,"https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=Offline for maintainence. Try again after few hours.🥲"); die(0);}
 /****************************************************************************************************/
 /*********************** input logs *****************************************************************/
@@ -90,7 +87,6 @@ if($offline_for_maintainence == true){ curlCommand(false,"https://api.telegram.o
         //readfile($file);
     }
 /************ ***************************************************************************************/
-
 /************ ********OfflienCURL send local file****************************************************/
 
         function localCURL($url,$data,$FILENAME){
@@ -98,8 +94,6 @@ if($offline_for_maintainence == true){ curlCommand(false,"https://api.telegram.o
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');      
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            if($GLOBALS['use_proxy']=true) { curl_setopt($ch, CURLOPT_PROXY, $GLOBALS['proxyA']); }
-            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
             curl_setopt($ch, CURLOPT_POST, 1);
             // Create CURLFile
             $finfo = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $FILENAME);
@@ -119,9 +113,6 @@ if($offline_for_maintainence == true){ curlCommand(false,"https://api.telegram.o
             //curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-            curl_setopt($ch, CURLOPT_HTTPGET, true);
-            if($GLOBALS['use_proxy']=true) { curl_setopt($ch, CURLOPT_PROXY, $GLOBALS['proxyA']); }
             
             //to get the file size
 			if($initialCall == true){
@@ -235,29 +226,11 @@ function curl_fetch_multi_2( array $urls_unique, int $max_connections = 25, arra
             $unemployed_workers[] = $ch;
         }
     };
-    //if($GLOBALS['use_proxy']=true) { curl_setopt($ch, CURLOPT_PROXY, $GLOBALS['proxyA']); }
-/**/    if($GLOBALS['use_proxy']=true) { 
-    $opts = array(
-        CURLOPT_URL => '',
-        CURLOPT_RETURNTRANSFER => 1,
-        CURLOPT_ENCODING => '',
-        CURLOPT_PROXY => $GLOBALS['proxyA'],
-        CURLOPT_TIMEOUT => 10
-        
-    );
-}
-        else {
     $opts = array(
         CURLOPT_URL => '',
         CURLOPT_RETURNTRANSFER => 1,
         CURLOPT_ENCODING => ''
-        
-    );        
-            
-        
-        
-        }
-/*    if($use_proxy=true) { curl_setopt($ch, CURLOPT_PROXY, $proxy); } */
+    );
     if (! empty($additional_curlopts)) {
         // i would have used array_merge(), but it does scary stuff with integer keys.. foreach() is easier to reason about
         foreach ($additional_curlopts as $key => $val) {
