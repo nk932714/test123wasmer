@@ -7,7 +7,6 @@
     $base_site_url = "https://www.xvideos.com";
     //$token = '5502034647:AAGQx84fiC_ksQNCdABcxasdaszzzxxxxxxxx'; 
     $token = $_ENV["token"];
-	$token = '7177155907:AAGJNdzWong2e7jGm82AUyDRCtVMw3WcnA8'; 
     $input_logs = true; $input_logs_filename = "log1.txt";                              //this will store complete input
     $filtered_input_logs = true; $filtered_input_logs_file_name = "log_filtered.txt";   //this will store search results
     $fevouriteButton = true; $user_fevourites = "log_user_fevourites.txt"; $fileIDandUniqueID = "log_fileIDandUniqueID.txt";          //this will store file ID and unique ID so when you will make anything fevourite it will find its file_ID from unique ID(can't send file id in callbck) and store in file
