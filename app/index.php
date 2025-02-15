@@ -241,11 +241,7 @@ function curl_fetch_multi_2( array $urls_unique, int $max_connections = 25, arra
             $work();
         }
         $new_worker = array_pop($unemployed_workers);
-	// ////////////////new
-	$encoded_url = urlencode($url);
-	$opts[CURLOPT_URL] = $encoded_url;
-	// ///////////////////
-        //$opts[CURLOPT_URL] = $url;
+        $opts[CURLOPT_URL] = $url;
         if (! curl_setopt_array($new_worker, $opts)) {
             $errstr = "curl_setopt_array failed: " . curl_errno($new_worker) . ": " . curl_error($new_worker) . " " . var_export($opts, true);
             throw new RuntimeException($errstr);
@@ -388,7 +384,8 @@ switch ($switchCondition) {
                                                                 [ "text" => "Related Videos", "callback_data" => "/Related_$vid_id2"]
                                                             ]]
                                     ];
-                                    $keyboard = json_encode($keyboard);
+                                    //$keyboard = json_encode($keyboard);
+				    $keyboard = rawurlencode(json_encode($keyboard));
                                    $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                                 }
                             $init_final = curl_fetch_multi_2($url_co);       //print_r( $init_final );
@@ -407,7 +404,8 @@ switch ($switchCondition) {
                                                                             [ "text" => $prevPtitle, "callback_data" => $prevP ]
                                                                         ]]   
                                     ];
-                            $keyboard_page = json_encode($keyboard_page);
+                            //$keyboard_page = json_encode($keyboard_page);
+				$keyboard_page = rawurlencode(json_encode($keyboard_page));
                             $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page;
                         $init = curlCommand(false,$url_ee); 
                                 }
@@ -445,7 +443,8 @@ switch ($switchCondition) {
                                                                 [ "text" => "Related Videos", "callback_data" => "/Related_$vid_id2"]
                                                             ]]
                                     ];
-                                    $keyboard = json_encode($keyboard);
+                                    //$keyboard = json_encode($keyboard);
+					$keyboard = rawurlencode(json_encode($keyboard));
                                    $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                                 }
                             $init_final = curl_fetch_multi_2($url_co);
@@ -464,7 +463,8 @@ switch ($switchCondition) {
                                                                             [ "text" => $prevPtitle, "callback_data" => $prevP ]
                                                                         ]]   
                                     ];
-                            $keyboard_page = json_encode($keyboard_page);
+                            //$keyboard_page = json_encode($keyboard_page);
+			$keyboard_page = rawurlencode(json_encode($keyboard_page));
                             $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page;
                         $init = curlCommand(false,$url_ee); 
                         //echo $init;
@@ -532,7 +532,8 @@ switch ($switchCondition) {
                                                                     [ "text" => "Love It!\u{2764}", "callback_data" => "/LOVE_$file_unique_id_N" ]
                                                                 ]]   
                                                         ];
-                                        $keyboard_page = json_encode($keyboard_page);
+                                        //$keyboard_page = json_encode($keyboard_page);
+				    $keyboard_page = rawurlencode(json_encode($keyboard_page));
                                         $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page."&reply_to_message_id=1";
                                         $init = curlCommand(false,$url_ee);
                                         $str_good_content_tracker = unserialize(file_get_contents($fileIDandUniqueID));
@@ -584,7 +585,8 @@ switch ($switchCondition) {
                                                                 [ "text" => "Related Videos", "callback_data" => "/Related_$vid_id2"]
                                                             ]]
                                     ];
-                                    $keyboard = json_encode($keyboard);
+                                    //$keyboard = json_encode($keyboard);
+			$keyboard = rawurlencode(json_encode($keyboard));
                         $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                     }
                     
