@@ -241,7 +241,11 @@ function curl_fetch_multi_2( array $urls_unique, int $max_connections = 25, arra
             $work();
         }
         $new_worker = array_pop($unemployed_workers);
-        $opts[CURLOPT_URL] = $url;
+	// ////////////////new
+	$encoded_url = urlencode($url);
+	$opts[CURLOPT_URL] = $encoded_url;
+	// ///////////////////
+        //$opts[CURLOPT_URL] = $url;
         if (! curl_setopt_array($new_worker, $opts)) {
             $errstr = "curl_setopt_array failed: " . curl_errno($new_worker) . ": " . curl_error($new_worker) . " " . var_export($opts, true);
             throw new RuntimeException($errstr);
