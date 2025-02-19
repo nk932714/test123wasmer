@@ -505,7 +505,7 @@ switch ($switchCondition) {
                 $init = curlCommand(false,$url_co,"","");
                 $data = json_decode($init);
                 $type = "video";/* v = video */ $sender_N = $data->result->chat->id; $file_id_N = $data->result->video->file_id;$file_unique_id_N = $data->result->video->file_unique_id; $caption_N = $data->result->caption;  // for fev button
-						$sender_N = (string)$sender_N
+						$sender_N = (string)$sender_N;
                 $sent_or_not = $data->ok;
                 if($sent_or_not != 1) { 
                                         //get file size
