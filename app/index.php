@@ -720,4 +720,5 @@ switch ($switchCondition) {
             $url_co = "https://api.telegram.org/bot$token/sendMessage". http_build_query($data);
             $init = curlCommand(false,$url_co,"","");
 }
+echo "You are running 2.6";
 ?>
