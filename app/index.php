@@ -541,6 +541,7 @@ switch ($switchCondition) {
                                         $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page."&reply_to_message_id=1";
                                         $init = curlCommand(false,$url_ee);
                                         $str_good_content_tracker = unserialize(file_get_contents($fileIDandUniqueID));
+				    	if (!isset($str_good_content_tracker)) {     $str_good_content_tracker = []; } // Initialize the array if it isn't already initialized
                                         $str_good_content_tracker[$file_unique_id_N]= [$file_unique_id_N => $file_id_N,"type"=>$type,$sender_N=>$caption_N]; //using chat id to get captions :)
                                         file_put_contents($fileIDandUniqueID,serialize($str_good_content_tracker));
                             }
