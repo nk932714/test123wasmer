@@ -405,8 +405,8 @@ switch ($switchCondition) {
                                                                         ]]   
                                     ];
                             //$keyboard_page = json_encode($keyboard_page);
-				if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
-				$keyboard_page = rawurlencode(json_encode($keyboard_page));
+				//if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
+				$keyboard_page = rawurlencode(json_encode($keyboard_page, JSON_BIGINT_AS_STRING));
                             $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page;
                         $init = curlCommand(false,$url_ee); 
                                 }
@@ -465,8 +465,8 @@ switch ($switchCondition) {
                                                                         ]]   
                                     ];
                             //$keyboard_page = json_encode($keyboard_page);
-			if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
-			$keyboard_page = rawurlencode(json_encode($keyboard_page));
+			//if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
+			$keyboard_page = rawurlencode(json_encode($keyboard_page, JSON_BIGINT_AS_STRING));
                             $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page;
                         $init = curlCommand(false,$url_ee); 
                         //echo $init;
@@ -535,8 +535,8 @@ switch ($switchCondition) {
                                                                 ]]   
                                                         ];
                                         //$keyboard_page = json_encode($keyboard_page);
-				    if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
-				    $keyboard_page = rawurlencode(json_encode($keyboard_page));
+				    //if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
+				    $keyboard_page = rawurlencode(json_encode($keyboard_page, JSON_BIGINT_AS_STRING));
                                         $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page."&reply_to_message_id=1";
                                         $init = curlCommand(false,$url_ee);
                                         $str_good_content_tracker = unserialize(file_get_contents($fileIDandUniqueID));
