@@ -1,6 +1,10 @@
 <?php
 /******************Version******************************/
-                //V2.12.9 experimental    //2.12.8 added empty fav or love msg if list is empty
+                //V2.13.0 fixed error in newer versions //V2.12.9 experimental    //2.12.8 added empty fav or love msg if list is empty
+/************* Installation (tested on PHP Version 8.3.4)********************************************************************/ 
+              //for installation [1. You need to enter token.] [2. then setwebhook by using this link (add your token and website address in url) "https://api.telegram.org/bot7177155907:Axxxxxxxxxxxxxxxxxxxx/setWebhook?url=https://yoursiteurl.com/index.php"] 
+              // your website should be https and valid certificate on free websites they blocked telegram api. //you can also check your webhook info @ https://api.telegram.org/bot{my_bot_token}/getWebhookInfo [for more info check https://stackoverflow.com/questions/42554548/how-to-set-telegram-bot-webhook]
+/******************************************************************************************************/
 /************* Universal constants********************************************************************/
     $limit_size_setting = "20";//server limit // if you are using url file then currently file size is limited to 20mb & if you are also using relaytive path means download & then upload then limit is 50mb
     $telegram_max_file_size = "50";
@@ -10,7 +14,7 @@
     $input_logs = true; $input_logs_filename = "log1.txt";                              //this will store complete input
     $filtered_input_logs = true; $filtered_input_logs_file_name = "log_filtered.txt";   //this will store search results
     $fevouriteButton = true; $user_fevourites = "log_user_fevourites.txt"; $fileIDandUniqueID = "log_fileIDandUniqueID.txt";          //this will store file ID and unique ID so when you will make anything fevourite it will find its file_ID from unique ID(can't send file id in callbck) and store in file
-    $pExtension = ".m3u";
+    $pExtension = ".m3u"; //this will work for android users with vlc installed & for ios user direct link will work
     $override_total_matches = 0; //or null or 0//so that when someone run start command it will show only first $override_total_matches matches
     $offline_for_maintainence = false;
     $php_version = 7; // use integers only //use 7 if you will face any error on 8
@@ -388,6 +392,7 @@ switch ($switchCondition) {
 				    $keyboard = rawurlencode(json_encode($keyboard));
                                    $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                                 }
+                                print_r( $init_final );
                             $init_final = curl_fetch_multi_2($url_co);       //print_r( $init_final );
                                /****************** Next Page buttons ***********/ 
                                 //str_contains only available in php 8+ //for next page buttons
@@ -405,8 +410,7 @@ switch ($switchCondition) {
                                                                         ]]   
                                     ];
                             //$keyboard_page = json_encode($keyboard_page);
-				//if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
-				$keyboard_page = rawurlencode(json_encode($keyboard_page, JSON_BIGINT_AS_STRING));
+				$keyboard_page = rawurlencode(json_encode($keyboard_page));
                             $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page;
                         $init = curlCommand(false,$url_ee); 
                                 }
@@ -418,10 +422,10 @@ switch ($switchCondition) {
                 //it will scrap the SEARCH crateria page and will send the thumbs with video scrap links links
                 $init = curlCommand(false,$xv_first_url,"","");
                 $re_thumb = '/<div class="thumb"><a href="(.*)"><img src="(.*)data-src="(.*?)" data-idcdn="(.*)" title="(.*?)">(.*?) <span class="duration">(.*?)<\/span><\/a><\/p>/m';
-                preg_match_all($re_thumb, $init, $matches);
+                preg_match_all($re_thumb, $init, $matches); //print_r($matches);
                 $total_matches = sizeof($matches[3]); 
                 if(!empty($override_total_matches)){ $total_matches = $override_total_matches;  }
-                for ($x = 0; $x <= $total_matches; $x++) {
+                for ($x = 0; $x < $total_matches; $x++) {
                                     $thumb = $matches[3][$x];
                                     $title = $matches[6][$x];
                                     $duration = $matches[7][$x];
@@ -448,6 +452,7 @@ switch ($switchCondition) {
 					$keyboard = rawurlencode(json_encode($keyboard));
                                    $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                                 }
+                                print_r( $url_co );
                             $init_final = curl_fetch_multi_2($url_co);
                                /****************** Next Page buttons ***********/ 
                                 //str_contains only available in php 8+ //for next page buttons
@@ -465,8 +470,7 @@ switch ($switchCondition) {
                                                                         ]]   
                                     ];
                             //$keyboard_page = json_encode($keyboard_page);
-			//if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
-			$keyboard_page = rawurlencode(json_encode($keyboard_page, JSON_BIGINT_AS_STRING));
+			$keyboard_page = rawurlencode(json_encode($keyboard_page));
                             $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page;
                         $init = curlCommand(false,$url_ee); 
                         //echo $init;
@@ -505,7 +509,6 @@ switch ($switchCondition) {
                 $init = curlCommand(false,$url_co,"","");
                 $data = json_decode($init);
                 $type = "video";/* v = video */ $sender_N = $data->result->chat->id; $file_id_N = $data->result->video->file_id;$file_unique_id_N = $data->result->video->file_unique_id; $caption_N = $data->result->caption;  // for fev button
-						$sender_N = (string)$sender_N;
                 $sent_or_not = $data->ok;
                 if($sent_or_not != 1) { 
                                         //get file size
@@ -536,12 +539,10 @@ switch ($switchCondition) {
                                                                 ]]   
                                                         ];
                                         //$keyboard_page = json_encode($keyboard_page);
-				    //if (is_float($keyboard_page)) {     $keyboard_page = (string)$keyboard_page; /* Convert large floats to string */ }
-				    $keyboard_page = rawurlencode(json_encode($keyboard_page, JSON_BIGINT_AS_STRING));
+				    $keyboard_page = rawurlencode(json_encode($keyboard_page));
                                         $url_ee = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=­&reply_markup=".$keyboard_page."&reply_to_message_id=1";
                                         $init = curlCommand(false,$url_ee);
                                         $str_good_content_tracker = unserialize(file_get_contents($fileIDandUniqueID));
-				    	if (!isset($str_good_content_tracker)) {     $str_good_content_tracker = []; } // Initialize the array if it isn't already initialized
                                         $str_good_content_tracker[$file_unique_id_N]= [$file_unique_id_N => $file_id_N,"type"=>$type,$sender_N=>$caption_N]; //using chat id to get captions :)
                                         file_put_contents($fileIDandUniqueID,serialize($str_good_content_tracker));
                             }
@@ -556,7 +557,7 @@ switch ($switchCondition) {
                 ];
             $url_co = "https://api.telegram.org/bot$token/sendMessage?". http_build_query($data);
             $init = curlCommand(false,$url_co);
-            //echo $init;
+            echo $url_co;
             
   break;
   case "5":
@@ -594,7 +595,7 @@ switch ($switchCondition) {
 			$keyboard = rawurlencode(json_encode($keyboard));
                         $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                     }
-                    
+                    print_r( $init_final );
                     $init = curl_fetch_multi_2($url_co);
                     //print_r($init); //for checking errors by sending post request. Note: remove/exclude reply_to_message_id
     break;
@@ -722,5 +723,4 @@ switch ($switchCondition) {
             $url_co = "https://api.telegram.org/bot$token/sendMessage". http_build_query($data);
             $init = curlCommand(false,$url_co,"","");
 }
-echo "You are running 2.8";
 ?>
