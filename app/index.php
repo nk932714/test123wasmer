@@ -65,6 +65,32 @@ if($offline_for_maintainence == true){ curlCommand(false,"https://api.telegram.o
         file_put_contents($input_logs_filename, $inputoldandnew);
     }
 /************ ***************************************************************************************/
+/***********************callback query ID****************************/
+// send this callbackquery if we will not send this and our php takes time then telegram api will try again the call and thinks that call failed
+//this may raise multiple call request from tg api and user will receive multiple responses
+if (  substr($text, 0, 8) == "/Normal_" || substr($text, 0, 4) == "/HD_") {
+    // Common code here
+    //file_get_contents("https://api.telegram.org/bot$token/answerCallbackQuery?callback_query_id={$callback_query_id}&text=Working...");
+        //$callbackQueryId = $_POST['callback_query']['id']; // or however you capture it
+        $url = "https://api.telegram.org/bot$token/answerCallbackQuery";
+        $data = [
+            'callback_query_id' => $callback_query_id,
+            'text' => 'We are working on your request...',
+            'show_alert' => true // set true if you want a popup alert
+        ];
+        
+        // Initialize cURL
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        var_dump($response);
+
+    }
+/************ ***************************************************************************************/
 /***********************check if request is made from http / https server****************************/
     function isSecure() {           //will return 1 if https
       return
@@ -361,19 +387,25 @@ switch ($switchCondition) {
   case "1":
                 //it will scrap the HOMEPAGE page and will send the thumbs with video scrap links
                 $init = curlCommand(false,$xv_first_url);
-                $re_thumb = '/<div class="microthumb-border"><\/div><\/div><div class="thumb"><a href="(.*)"><img src="(.*)data-src="(.*?)" data-idcdn="(.*)" title="(.*?)">(.*?) <span class="duration">(.*?)<\/span><\/a><\/p>/m';
+                //$re_thumb = '/<div class="microthumb-border"><\/div><\/div><div class="thumb"><a href="(.*)"><img src="(.*)data-src="(.*?)" data-idcdn="(.*)" title="(.*?)">(.*?) <span class="duration">(.*?)<\/span><\/a><\/p>/m';
+                $re_thumb = '/<div class="thumb">\s*<a href="([^"]+)">\s*<img[^>]*data-src="([^"]+)"[^>]*\/?>.*?<\/a>.*?<p class="title">\s*<a[^>]*title="([^"]+)"[^>]*>(.*?)<span class="duration">([^<]+)<\/span>/s';
                 preg_match_all($re_thumb, $init, $matches);
-                $total_matches = sizeof($matches[3]);
+                $total_matches = sizeof($matches[3]);  echo $total_matches;
                 if(!empty($override_total_matches)){ $total_matches = $override_total_matches;  }
                 for ($x = 0; $x < $total_matches; $x++) {
-                                    $thumb = $matches[3][$x];
-                                    $title = $matches[6][$x];
-                                    $duration = $matches[7][$x];
-                                    $vid_id = $matches[1][$x];
+                    $vid_id   = $matches[1][$x];
+                    $thumb    = $matches[2][$x];
+                    $title    = $matches[3][$x]; // better (cleapn title)
+                    $duration = $matches[5][$x];
+                                   // $thumb = $matches[3][$x];
+                                //    $title = $matches[6][$x];
+                                  //  $duration = $matches[7][$x];
+                                //    $vid_id = $matches[1][$x];
                                     $chunks = explode('/', $vid_id);
-                                    $vid_id2 = $chunks[1];
+                                    $vid_id2 = $chunks[1]; //print_r($vid_id);
                                     if(strtolower($send_photo_or_video) == "video"){    $chunks_thumb = explode('/', $thumb);
-                                    $thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/videopreview/".$chunks_thumb[5]."/".$chunks_thumb[6]."/".$chunks_thumb[7]."/".$chunks_thumb[8]."_169.mp4"; }
+                                    //$thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/videopreview/".$chunks_thumb[5]."/".$chunks_thumb[6]."/".$chunks_thumb[7]."/".$chunks_thumb[8]."_169.mp4"; }
+                            		$thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/preview.mp4"; }
                             		$data = [ 
                             		            'chat_id' => $chat_id,
                             		            'reply_to_message_id' => $reply_to_message_id,
@@ -392,8 +424,7 @@ switch ($switchCondition) {
 				    $keyboard = rawurlencode(json_encode($keyboard));
                                    $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                                 }
-                                print_r( $init_final );
-                            $init_final = curl_fetch_multi_2($url_co);       //print_r( $init_final );
+                            $init_final = curl_fetch_multi_2($url_co);       /* print_r( $init_final ); */ /**/ print_r($vid_id2); /**/
                                /****************** Next Page buttons ***********/ 
                                 //str_contains only available in php 8+ //for next page buttons
                                 $next_page = false;
@@ -421,19 +452,25 @@ switch ($switchCondition) {
   case "2":
                 //it will scrap the SEARCH crateria page and will send the thumbs with video scrap links links
                 $init = curlCommand(false,$xv_first_url,"","");
-                $re_thumb = '/<div class="thumb"><a href="(.*)"><img src="(.*)data-src="(.*?)" data-idcdn="(.*)" title="(.*?)">(.*?) <span class="duration">(.*?)<\/span><\/a><\/p>/m';
-                preg_match_all($re_thumb, $init, $matches); //print_r($matches);
+                //$re_thumb = '/<div class="thumb"><a href="(.*)"><img src="(.*)data-src="(.*?)" data-idcdn="(.*)" title="(.*?)">(.*?) <span class="duration">(.*?)<\/span><\/a><\/p>/m';
+                $re_thumb = '/<div class="thumb">\s*<a href="([^"]+)">\s*<img[^>]*data-src="([^"]+)"[^>]*\/?>.*?<\/a>.*?<p class="title">\s*<a[^>]*title="([^"]+)"[^>]*>(.*?)<span class="duration">([^<]+)<\/span>/s';
+                preg_match_all($re_thumb, $init, $matches);
                 $total_matches = sizeof($matches[3]); 
                 if(!empty($override_total_matches)){ $total_matches = $override_total_matches;  }
-                for ($x = 0; $x < $total_matches; $x++) {
-                                    $thumb = $matches[3][$x];
-                                    $title = $matches[6][$x];
-                                    $duration = $matches[7][$x];
-                                    $vid_id = $matches[1][$x];
+                for ($x = 0; $x <= $total_matches; $x++) {
+                                    $vid_id   = $matches[1][$x];
+                                    $thumb    = $matches[2][$x];
+                                    $title    = $matches[3][$x]; // better (cleapn title)
+                                    $duration = $matches[5][$x];
+                                    //$thumb = $matches[3][$x];
+                                    //$title = $matches[6][$x];
+                                    //$duration = $matches[7][$x];
+                                    //$vid_id = $matches[1][$x];
                                         $chunks = explode('/', $vid_id);
                                         $vid_id2 = $chunks[1];
                                     if(strtolower($send_photo_or_video) == "video"){    $chunks_thumb = explode('/', $thumb);
-                                    $thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/videopreview/".$chunks_thumb[5]."/".$chunks_thumb[6]."/".$chunks_thumb[7]."/".$chunks_thumb[8]."_169.mp4"; }
+                                    //$thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/videopreview/".$chunks_thumb[5]."/".$chunks_thumb[6]."/".$chunks_thumb[7]."/".$chunks_thumb[8]."_169.mp4"; }
+                                    $thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/preview.mp4"; }
                             		$data = [ 
                             		            'chat_id' => $chat_id,
                             		            'reply_to_message_id' => $reply_to_message_id,
@@ -452,7 +489,6 @@ switch ($switchCondition) {
 					$keyboard = rawurlencode(json_encode($keyboard));
                                    $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                                 }
-                                print_r( $url_co );
                             $init_final = curl_fetch_multi_2($url_co);
                                /****************** Next Page buttons ***********/ 
                                 //str_contains only available in php 8+ //for next page buttons
@@ -480,6 +516,8 @@ switch ($switchCondition) {
 
     break;
   case "3":
+                //sending video link but before sending tell them we are working on it
+                //file_get_contents("https://api.telegram.org/bot$token/answerCallbackQuery?callback_query_id={$callback_query_id}&text=Working...");
                 //sending video link
                 $text = $xv_first_url;
                 $init = curlCommand(false,$xv_first_url,"","");
@@ -557,7 +595,7 @@ switch ($switchCondition) {
                 ];
             $url_co = "https://api.telegram.org/bot$token/sendMessage?". http_build_query($data);
             $init = curlCommand(false,$url_co);
-            echo $url_co;
+            //echo $init;
             
   break;
   case "5":
@@ -576,7 +614,8 @@ switch ($switchCondition) {
                                     $chunks = explode('/', $vid_id);
                                     $vid_id2 = $chunks[1];
                                     if(strtolower($send_photo_or_video) == "video"){    $chunks_thumb = explode('/', $thumb);
-                                    $thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/videopreview/".$chunks_thumb[5]."/".$chunks_thumb[6]."/".$chunks_thumb[7]."/".$chunks_thumb[8]."_169.mp4"; }
+                                    //$thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/videopreview/".$chunks_thumb[5]."/".$chunks_thumb[6]."/".$chunks_thumb[7]."/".$chunks_thumb[8]."_169.mp4"; }
+                            		$thumb = $chunks_thumb[0]."//".$chunks_thumb[2]."/".$chunks_thumb[3]."/preview.mp4"; }
                             		$data = [ 
                             		            'chat_id' => $chat_id,
                             		            'reply_to_message_id' => $reply_to_message_id,
@@ -595,7 +634,7 @@ switch ($switchCondition) {
 			$keyboard = rawurlencode(json_encode($keyboard));
                         $url_co[] = "https://api.telegram.org/bot$token/send".ucfirst($send_photo_or_video)."?". http_build_query($data)."&reply_markup=".$keyboard;
                     }
-                    print_r( $init_final );
+                    
                     $init = curl_fetch_multi_2($url_co);
                     //print_r($init); //for checking errors by sending post request. Note: remove/exclude reply_to_message_id
     break;
